@@ -2,8 +2,10 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 
+const deps = require("./package.json").dependencies;
+
 module.exports = {
-    entry: "./src/index.tsx",
+    entry: "./src/index.js",
     devServer: {
         contentBase: path.join(__dirname, "dist"),
         port: 3002,
@@ -37,12 +39,25 @@ module.exports = {
         ],
     },
     resolve: {
+        alias: {
+            pages: path.resolve(__dirname, 'src/pages'),
+        },
         extensions: ['.tsx', '.ts', '.js']
     },
     plugins: [
         new ModuleFederationPlugin({
             remotes: {
-                remoteComponents: 'remoteComponents'
+                components: "components@http://localhost:3001/components.js"
+            },
+            shared: { 
+                react: {
+                    singleton: true,
+                    requiredVersion: deps.react,
+                  },
+                "react-dom": {
+                    singleton: true,
+                    requiredVersion: deps["react-dom"],
+                },
             }
         }),
         new HtmlWebpackPlugin({
