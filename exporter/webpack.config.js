@@ -2,6 +2,8 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 
+const deps = require('./package.json').dependencies;
+
 module.exports = {
     entry: "./src/index.js",
     devServer: {
@@ -44,13 +46,22 @@ module.exports = {
             template: path.join(__dirname, 'src', 'index.html')
         }),
         new ModuleFederationPlugin({
-            name: 'remoteComponents',
-            library: { type: 'var', name: 'remoteComponents' },
+            name: 'components',
+            library: { type: 'var', name: 'components' },
             filename: 'components.js',
             exposes: {
-                WellcomeScreen: './src/components/wellcomeScreen'
+                './WellcomeScreen': './src/components/wellcomeScreen'
             },
-            shared: ['react', 'react-dom']
+            shared: {
+                react: {
+                    requiredVersion: deps.react,
+                    singleton: true,
+                },
+                'react-dom': {
+                    requiredVersion: deps['react-dom'],
+                    singleton: true,
+                },
+            },
         })
     ],
     output: {

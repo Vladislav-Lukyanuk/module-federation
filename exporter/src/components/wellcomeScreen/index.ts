@@ -1,1 +1,1 @@
-export { WellcomeScreen } from './WellcomeScreen';
+export { WellcomeScreen as default } from './WellcomeScreen';
